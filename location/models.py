@@ -3,7 +3,8 @@ from django.db import models
 
 class Currency(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    symbol = models.CharField(max_length=50, unique=True)
+    currency = models.CharField(max_length=10, unique=True)
+    currency_symbol = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return f"{self.name} | {self.symbol}"
@@ -12,9 +13,9 @@ class Currency(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=50, unique=True)
     capital = models.CharField(max_length=50, unique=True)
-    phone_code = models.IntegerField(max_length=20, null=True, blank=True)
+    phone_code = models.IntegerField(null=True, blank=True)
     currency = models.ForeignKey(
-        Currency, on_delete=models.SET_NULL, related_name="country_currencies")
+        Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name="country_currencies")
     iso2 = models.CharField(max_length=3, unique=True)
     iso3 = models.CharField(max_length=4, unique=True)
     flag = models.SlugField(max_length=50)
