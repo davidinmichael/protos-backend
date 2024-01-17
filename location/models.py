@@ -1,3 +1,56 @@
 from django.db import models
 
-# Create your models here.
+
+class Currency(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    symbol = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f"{self.name} | {self.symbol}"
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    capital = models.CharField(max_length=50, unique=True)
+    phone_code = models.IntegerField(max_length=20, null=True, blank=True)
+    currency = models.ForeignKey(
+        Currency, on_delete=models.SET_NULL, related_name="country_currencies")
+    iso2 = models.CharField(max_length=3, unique=True)
+    iso3 = models.CharField(max_length=4, unique=True)
+    flag = models.SlugField(max_length=50)
+
+    def generate_flag_url(self):
+        return f"https://flagcdn.com/256x192/{self.iso2.lower()}.png"
+
+    def generate_phone_code(self):
+        return f"+{self.phone_code}"
+
+    def save(self, *args, **kwargs):
+        if not self.flag:
+            self.flag = self.generate_flag_url()
+        if self.phone_code:
+            self.phone_code = self.generate_phone_code()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} | {self.capital}"
+
+
+class State(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    state_code = models.CharField(
+        max_length=5, unique=True, null=True, blank=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.CASCADE, related_name="country_states")
+
+    def __str__(self):
+        return f"{self.name} State of {self.country}"
+
+
+class City(models.Model):
+    name = models.CharField(max_length=50)
+    state = models.ForeignKey(
+        State, on_delete=models.CASCADE, related_name="state_cities")
+
+    def __str__(self):
+        return f"{self.name} City of {self.state}"
