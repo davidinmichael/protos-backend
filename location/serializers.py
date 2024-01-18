@@ -15,6 +15,11 @@ class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = "__all__"
+    
+    def to_representation(self, instance):
+        country = super().to_representation(instance)
+        country["phone_code"] = f"+{country['phone_code']}"
+        return country
 
 
 class StateSerializer(serializers.ModelSerializer):

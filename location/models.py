@@ -7,7 +7,7 @@ class Currency(models.Model):
     currency_symbol = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        return f"{self.name} | {self.symbol}"
+        return f"{self.name} | {self.currency_symbol}"
 
 
 class Country(models.Model):
@@ -18,13 +18,10 @@ class Country(models.Model):
         Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name="country_currencies")
     iso2 = models.CharField(max_length=3, unique=True)
     iso3 = models.CharField(max_length=4, unique=True)
-    flag = models.SlugField(max_length=50)
+    flag = models.SlugField(max_length=50, null=True, blank=True)
 
     def generate_flag_url(self):
         return f"https://flagcdn.com/256x192/{self.iso2.lower()}.png"
-
-    def generate_phone_code(self):
-        return f"+{self.phone_code}"
 
     def save(self, *args, **kwargs):
         if not self.flag:
