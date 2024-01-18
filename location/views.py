@@ -33,14 +33,15 @@ class CountryView(APIView):
 class StateView(APIView):
     def get(self, request):
         """Used to list all states, commented code for creating states"""
-        country = nigeria["name"]
-        country_instance = Country.objects.get(name=country)
+        # country = nigeria["name"]
+        # country_instance = Country.objects.get(name=country)
         # for state in nigeria["states"]:
         #     State.objects.create(
         #         name=state["name"], state_code=state["state_code"], country=country_instance)
-        nigerian_states = country_instance.country_states.all()
-        serializer = StateSerializer(nigerian_states, many=True)
+        states = State.objects.all()
+        serializer = StateSerializer(states, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
 
 class CityView(APIView):
     def get(self, request):
@@ -50,5 +51,27 @@ class CityView(APIView):
         #     for city in state["cities"]:
         #         city_c = City.objects.create(name=city["name"], state=state_q)
         cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class CountryStateView(APIView):
+    def get(self, request, pk):
+        try:
+            country = Country.objects.get(id=pk)
+        except Country.DoesNotExist:
+            return Response({"message": "This country is not supported yet"}, status.HTTP_404_NOT_FOUND)
+        country_states = country.country_states.all()
+        serializer = StateSerializer(country_states, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+
+class StateCityView(APIView):
+    def get(self, request, pk):
+        try:
+            state = State.objects.get(id=pk)
+        except State.DoesNotExist:
+            return Response({"message": "This state does not exist or is not supported yet"}, status.HTTP_404_NOT_FOUND)
+        cities = state.state_cities.all()
         serializer = CitySerializer(cities, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
