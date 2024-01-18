@@ -28,3 +28,16 @@ class CountryView(APIView):
         country = Country.objects.all()
         serializer = CountrySerializer(country, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class StateView(APIView):
+    def get(self, request):
+        """Used to list all states, commented code for creating states"""
+        country = nigeria["name"]
+        country_instance = Country.objects.get(name=country)
+        # for state in nigeria["states"]:
+        #     State.objects.create(
+        #         name=state["name"], state_code=state["state_code"], country=country_instance)
+        nigerian_states = country_instance.country_states.all()
+        serializer = StateSerializer(nigerian_states, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)

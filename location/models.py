@@ -26,8 +26,6 @@ class Country(models.Model):
     def save(self, *args, **kwargs):
         if not self.flag:
             self.flag = self.generate_flag_url()
-        if self.phone_code:
-            self.phone_code = self.generate_phone_code()
         super().save(*args, **kwargs)
 
     def __str__(self):
