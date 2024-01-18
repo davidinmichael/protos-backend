@@ -41,3 +41,14 @@ class StateView(APIView):
         nigerian_states = country_instance.country_states.all()
         serializer = StateSerializer(nigerian_states, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
+class CityView(APIView):
+    def get(self, request):
+        """Used to list all cities, commented code for creating cities"""
+        # for state in nigeria["states"]:
+        #     state_q = State.objects.get(name=state["name"])
+        #     for city in state["cities"]:
+        #         city_c = City.objects.create(name=city["name"], state=state_q)
+        cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
