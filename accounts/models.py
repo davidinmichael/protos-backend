@@ -45,7 +45,7 @@ class PersonalAccount(AbstractUser):
     date_joined = models.DateField(default=timezone.now)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["password"]
+    REQUIRED_FIELDS = []
 
     objects = AccountManager()
 
@@ -56,6 +56,16 @@ class PersonalAccount(AbstractUser):
         if not self.user_id:
             self.user_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
+    
+    def get_account_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+
+class BusinessCategory(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class BusinessAccount(models.Model):
@@ -73,6 +83,7 @@ class BusinessAccount(models.Model):
     address = models.CharField(max_length=100, null=True, blank=True)
     website = models.SlugField(
         unique=True, null=True, blank=True, max_length=100)
+    category = models.ManyToMany(BusinessCategory, null=True, blank=True)
     business_id = models.CharField(
         max_length=10, unique=True, blank=True, null=True)
     email_verified = models.BooleanField(default=False)
@@ -82,9 +93,19 @@ class BusinessAccount(models.Model):
         return f"{self.owner} | {self.name}"
 
     def save(self, *args, **kwargs):
-        self.owner.is_business_owner = True
-        self.owner.save()
+        if not self.owner.is_business_owner:
+            self.owner.is_business_owner = True
+            self.owner.save()
         if not self.business_id:
             self.business_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
 
+
+class UserToken(models.Model):
+    user = models.ForeignKey(PersonalAccount, on_delete=models.CASCADE)
+    token = models.CharField(max_length=7, null=True, blank=True, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = str(uuid.uuid4()).replace('-', "").upper()[:4]
+        return super().save(*args, **kwargs)
