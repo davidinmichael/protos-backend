@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.core.exceptions import ValidationError
+import re
 from .models import BusinessAccount, BusinessCategory, PersonalAccount
 from location.models import *
 
@@ -26,6 +28,18 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
 
     def validate_city(self, value):
         return City.objects.get(name=value)
+    
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise ValidationError(
+                "Password must be at least 8 characters long")
+        if not any(char.isupper() for char in value):
+            raise ValidationError(
+                "Password must contain at least one uppercase letter")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
+            raise ValidationError(
+                "Password must contain at least one special character")
+        return value
 
 
 class BusinessCategorySerializer(serializers.ModelSerializer):
