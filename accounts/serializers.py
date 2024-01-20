@@ -18,6 +18,15 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         write_only_fields = ["password"]
 
+    def validate_country(self, value):
+        return Country.objects.get(name=value)
+
+    def validate_state(self, value):
+        return State.objects.get(name=value)
+
+    def validate_city(self, value):
+        return City.objects.get(name=value)
+
 
 class BusinessCategorySerializer(serializers.ModelSerializer):
     class Meta:
