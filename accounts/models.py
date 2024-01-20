@@ -1,4 +1,4 @@
-from email.policy import default
+from enum import unique
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
@@ -56,3 +56,35 @@ class PersonalAccount(AbstractUser):
         if not self.user_id:
             self.user_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
+
+
+class BusinessAccount(models.Model):
+    owner = models.ForeignKey(PersonalAccount, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    contact_number = models.CharField(max_length=20, unique=True)
+    country = models.ForeignKey(
+        Country, null=True, blank=True, on_delete=models.SET_NULL)
+    state = models.ForeignKey(
+        State, null=True, blank=True, on_delete=models.SET_NULL)
+    city = models.ForeignKey(
+        City, null=True, blank=True, on_delete=models.SET_NULL)
+    postal_code = models.IntegerField(null=True, blank=True)
+    address = models.CharField(max_length=100, null=True, blank=True)
+    website = models.SlugField(
+        unique=True, null=True, blank=True, max_length=100)
+    business_id = models.CharField(
+        max_length=10, unique=True, blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
+    date_joined = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.owner} | {self.name}"
+
+    def save(self, *args, **kwargs):
+        self.owner.is_business_owner = True
+        self.owner.save()
+        if not self.business_id:
+            self.business_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
+        return super().save(*args, **kwargs)
+
