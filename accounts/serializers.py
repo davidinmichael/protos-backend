@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import BusinessAccount, PersonalAccount
+from .models import BusinessAccount, BusinessCategory, PersonalAccount
 from location.models import *
 
 
@@ -18,6 +18,12 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         write_only_fields = ["password"]
 
+
+class BusinessCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessCategory
+        fields = "__all__"
+        read_only_fields = ["id"]
 
 class BusinessAccountSerializer(serializers.ModelSerializer):
     owner = serializers.SlugRelatedField(
