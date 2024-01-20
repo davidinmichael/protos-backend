@@ -65,7 +65,7 @@ class LoginView(APIView):
             serializer = PersonalAccountSerializer(user)
             refresh = RefreshToken.for_user(user)
             data["message"] = "Login Successfull"
-            data["account"] = serializer.data
+            data["user_details"] = serializer.data
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)
             return Response(data, status.HTTP_200_OK)
@@ -77,4 +77,23 @@ class BusinessAccountView(APIView):
     def post(self, request):
         serializer = BusinessAccountSerializer(data=request.data)
         if serializer.is_valid():
-            pass
+            business = serializer.save(owner=request.user)
+            business_serializer = BusinessAccountSerializer(business)
+            return Response(business_serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
+        
+class BusinessListings(APIView):
+    def get(self, request):
+        data = {}
+        user = request.user
+        user_details = PersonalAccount.objects.get(email=request.user.email)
+        serializer = PersonalAccountSerializer(user_details)
+        city_businesses = BusinessAccount.objects.filter(state=user.state.name)
+        city_businesses_serializer = BusinessAccountSerializer(city_businesses, many=True)
+        state_businesses = BusinessAccount.objects.filter(country=user.country.name)
+        state_businesses_serializer = BusinessAccountSerializer(state_businesses, many=True)
+        data["city_businesses"] = city_businesses_serializer.data
+        data["state_business"] = state_businesses_serializer.data
+        data["current_user"] = serializer.data
+        return Response(data, status.HTTP_200_OK)
