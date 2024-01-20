@@ -45,7 +45,7 @@ class PersonalAccount(AbstractUser):
     date_joined = models.DateField(default=timezone.now)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["password"]
+    REQUIRED_FIELDS = []
 
     objects = AccountManager()
 
