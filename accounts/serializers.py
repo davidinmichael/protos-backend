@@ -25,9 +25,9 @@ class BusinessCategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["id"]
 
+
 class BusinessAccountSerializer(serializers.ModelSerializer):
-    owner = serializers.SlugRelatedField(
-        queryset=BusinessAccount.objects.all(), slug_field="owner")
+    owner = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = BusinessAccount

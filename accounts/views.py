@@ -77,4 +77,8 @@ class BusinessAccountView(APIView):
     def post(self, request):
         serializer = BusinessAccountSerializer(data=request.data)
         if serializer.is_valid():
-            pass
+            business = serializer.save(owner=request.user)
+            business_serializer = BusinessAccountSerializer(business)
+            return Response(business_serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
