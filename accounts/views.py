@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.template.loader import render_to_string
 
 from accounts.serializers import BusinessAccountSerializer, PersonalAccountSerializer
 from .models import *
+from .utils import *
 
 
 class PersonalAccountView(APIView):
@@ -23,6 +25,10 @@ class PersonalAccountView(APIView):
                     'name': user.get_account_name(),
                     "token": user_token.token
                 }
+                template = render_to_string(
+                    "account/welcome_email.html", context)
+                token_send_email(user.email, "Very Email",
+                                 user_token.token, template)
             else:
                 data["name"] = f"Hello {user.first_name},"
                 data["message"] = "Your Account is created successfully. Continue to Login"
@@ -46,7 +52,6 @@ class VerifyEmail(APIView):
         return Response({"message": "Account Verified"}, status.HTTP_200_OK)
 
 
-
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -66,7 +71,8 @@ class LoginView(APIView):
             return Response(data, status.HTTP_200_OK)
         else:
             return Response({'error': 'Wrong Password'}, status.HTTP_400_BAD_REQUEST)
-    
+
+
 class BusinessAccountView(APIView):
     def post(self, request):
         serializer = BusinessAccountSerializer(data=request.data)

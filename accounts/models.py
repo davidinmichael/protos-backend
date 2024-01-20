@@ -93,8 +93,9 @@ class BusinessAccount(models.Model):
         return f"{self.owner} | {self.name}"
 
     def save(self, *args, **kwargs):
-        self.owner.is_business_owner = True
-        self.owner.save()
+        if not self.owner.is_business_owner:
+            self.owner.is_business_owner = True
+            self.owner.save()
         if not self.business_id:
             self.business_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
