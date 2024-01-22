@@ -27,7 +27,7 @@ class PersonalAccountView(APIView):
                 }
                 template = render_to_string(
                     "account/welcome_email.html", context)
-                token_send_email(user.email, "Very Email",
+                token_send_email(user.email, "Verify Email",
                                  user_token.token, template)
             else:
                 data["name"] = f"Hello {user.first_name},"
@@ -82,18 +82,32 @@ class BusinessAccountView(APIView):
             return Response(business_serializer.data, status.HTTP_201_CREATED)
         else:
             return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
-        
+
+
 class BusinessListings(APIView):
     def get(self, request):
         data = {}
         user = request.user
         user_details = PersonalAccount.objects.get(email=request.user.email)
         serializer = PersonalAccountSerializer(user_details)
-        city_businesses = BusinessAccount.objects.filter(state=user.state.name)
-        city_businesses_serializer = BusinessAccountSerializer(city_businesses, many=True)
-        state_businesses = BusinessAccount.objects.filter(country=user.country.name)
-        state_businesses_serializer = BusinessAccountSerializer(state_businesses, many=True)
+        city_businesses = BusinessAccount.objects.filter(city=user.city.name)
+        city_businesses_serializer = BusinessAccountSerializer(
+            city_businesses, many=True)
         data["city_businesses"] = city_businesses_serializer.data
-        data["state_business"] = state_businesses_serializer.data
+
+        if city_businesses.count() < 50:
+            state_businesses = BusinessAccount.objects.filter(
+                state=user.state.name)
+            state_businesses_serializer = BusinessAccountSerializer(
+                state_businesses, many=True)
+            data["state_businesses"] = state_businesses_serializer.data
+
+            if state_businesses.count() < 50:
+                country_businesses = BusinessAccount.objects.filter(
+                    country=user.country.name)
+                country_business_serializer = BusinessAccountSerializer(
+                    country_businesses, many=True)
+                data["country_businesses"] = country_business_serializer.data
+
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)
