@@ -56,7 +56,7 @@ class PersonalAccount(AbstractUser):
         if not self.user_id:
             self.user_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
-    
+
     def get_account_name(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -109,3 +109,28 @@ class UserToken(models.Model):
         if not self.token:
             self.token = str(uuid.uuid4()).replace('-', "").upper()[:4]
         return super().save(*args, **kwargs)
+
+
+class BusinessHour(models.Model):
+    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    day = models.CharField(max_length=10, null=True, blank=True)
+    open_time = models.CharField(
+        max_length=10, null=True, blank=True)  # "09:00:00"
+    close_time = models.CharField(max_length=10, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.business} | {self.open_time}"
+
+{
+  "field1": "value1",
+  "field2": "value2",
+  "field3": "value3",
+  "extra_field": "additional_value",
+  "hours": [
+      {"day":"Monday", "open_time":"08:00 AM", "close_time":"17:00 PM"},
+      {"day":"Tuesday", "open_time":"08:00 AM", "close":"17:00 PM"},
+      {"day":"Wednessday", "open_time":"08:00 AM", "close":"17:00 PM"},
+      {"day":"Thursday", "open_time":"08:00 AM", "close":"17:00 PM"},
+      {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"},
+  ]
+}
