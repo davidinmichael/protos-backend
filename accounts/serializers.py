@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 import re
-from .models import BusinessAccount, BusinessCategory, PersonalAccount
+from .models import *
 from location.models import *
 
 
@@ -56,3 +56,16 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
         model = BusinessAccount
         fields = "__all__"
         read_only_fields = ["id"]
+
+class BusinessHourSerializer(serializers.ModelSerializer):
+    business = BusinessAccountSerializer()
+    class Meta:
+        model = BusinessHour
+        fields = "__all__"
+        read_only_fields = ["id"]
+
+
+# class BusinessSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = BusinessAccount
+#         fields = ""

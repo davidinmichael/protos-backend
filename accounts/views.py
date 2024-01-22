@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
 
-from accounts.serializers import BusinessAccountSerializer, PersonalAccountSerializer
+from .serializers import *
 from .models import *
 from .utils import *
 
@@ -79,11 +79,11 @@ class BusinessAccountView(APIView):
         serializer = BusinessAccountSerializer(data=request.data)
         if serializer.is_valid():
             business = serializer.save(owner=request.user)
-            business_serializer = BusinessAccountSerializer(business)
             for hour in hours:
                 business_hours = BusinessHour.objects.create(
                     business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
-            return Response(business_serializer.data, status.HTTP_201_CREATED)
+            business_hours_serializer = BusinessHourSerializer(business_hours)
+            return Response(business_hours_serializer.data, status.HTTP_201_CREATED)
         else:
             return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
 
@@ -95,21 +95,21 @@ class BusinessListings(APIView):
         user_details = PersonalAccount.objects.get(email=request.user.email)
         serializer = PersonalAccountSerializer(user_details)
         city_businesses = BusinessAccount.objects.filter(city=user.city.name)
-        city_businesses_serializer = BusinessAccountSerializer(
+        city_businesses_serializer = BusinessHourSerializer(
             city_businesses, many=True)
         data["city_businesses"] = city_businesses_serializer.data
 
         if city_businesses.count() < 50:
             state_businesses = BusinessAccount.objects.filter(
                 state=user.state.name)
-            state_businesses_serializer = BusinessAccountSerializer(
+            state_businesses_serializer = BusinessHourSerializer(
                 state_businesses, many=True)
             data["state_businesses"] = state_businesses_serializer.data
 
             if state_businesses.count() < 50:
                 country_businesses = BusinessAccount.objects.filter(
                     country=user.country.name)
-                country_business_serializer = BusinessAccountSerializer(
+                country_business_serializer = BusinessHourSerializer(
                     country_businesses, many=True)
                 data["country_businesses"] = country_business_serializer.data
 

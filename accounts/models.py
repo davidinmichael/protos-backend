@@ -121,16 +121,16 @@ class BusinessHour(models.Model):
     def __str__(self):
         return f"{self.business} | {self.open_time}"
 
-{
-  "field1": "value1",
-  "field2": "value2",
-  "field3": "value3",
-  "extra_field": "additional_value",
-  "hours": [
-      {"day":"Monday", "open_time":"08:00 AM", "close_time":"17:00 PM"},
-      {"day":"Tuesday", "open_time":"08:00 AM", "close":"17:00 PM"},
-      {"day":"Wednessday", "open_time":"08:00 AM", "close":"17:00 PM"},
-      {"day":"Thursday", "open_time":"08:00 AM", "close":"17:00 PM"},
-      {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"},
-  ]
-}
+# {
+#   "field1": "value1",
+#   "field2": "value2",
+#   "field3": "value3",
+#   "extra_field": "additional_value",
+#   "hours": [
+#       {"day":"Monday", "open_time":"08:00 AM", "close_time":"17:00 PM"},
+#       {"day":"Tuesday", "open_time":"08:00 AM", "close":"17:00 PM"},
+#       {"day":"Wednessday", "open_time":"08:00 AM", "close":"17:00 PM"},
+#       {"day":"Thursday", "open_time":"08:00 AM", "close":"17:00 PM"},
+#       {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"},
+#   ]
+# }
