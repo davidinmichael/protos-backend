@@ -28,7 +28,7 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
 
     def validate_city(self, value):
         return City.objects.get(name=value)
-    
+
     def validate_password(self, value):
         if len(value) < 8:
             raise ValidationError(
@@ -49,23 +49,49 @@ class BusinessCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class BusinessAccountSerializer(serializers.ModelSerializer):
-    owner = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = BusinessAccount
-        fields = "__all__"
-        read_only_fields = ["id"]
-
 class BusinessHourSerializer(serializers.ModelSerializer):
-    business = BusinessAccountSerializer()
     class Meta:
         model = BusinessHour
         fields = "__all__"
         read_only_fields = ["id"]
 
 
-# class BusinessSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = BusinessAccount
-#         fields = ""
+class BusinessAccountSerializer(serializers.ModelSerializer):
+    owner = PersonalAccountSerializer()
+    categories = BusinessCategorySerializer(many=True)
+    hours = BusinessHourSerializer(many=True)
+
+    class Meta:
+        model = BusinessAccount
+        fields = ["id", "owner", "name", "email", "contact_number", "country",
+                  "state", "city", "postal_code", "address", "website",
+                  "business_id", "email_verified", "data_joined", "categories",
+                  "hours"]
+        read_only_fields = ["id"]
+
+    def validate_country(self, value):
+        return Country.objects.get(name=value)
+
+    def validate_state(self, value):
+        return State.objects.get(name=value)
+
+    def validate_city(self, value):
+        return City.objects.get(name=value)
+
+    def create(self, validated_data):
+        owner = validated_data.pop("owner")
+        categories = validated_data.pop("categories", None)
+        hours = validated_data.pop("hours", None)
+
+        business_owner = PersonalAccount.objects.create(**owner)
+        business = BusinessAccount.objects.create(
+            owner=business_owner, **validated_data)
+        if categories is not None:
+            for category in categories:
+                cat = BusinessCategory.objects.get(name=category["name"])
+                business.categories.add(cat)
+        if hours is not None:
+            for hour in hours:
+                business_hours = BusinessHour.objects.create(
+                    business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
+        return business

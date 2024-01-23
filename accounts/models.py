@@ -83,7 +83,7 @@ class BusinessAccount(models.Model):
     address = models.CharField(max_length=100, null=True, blank=True)
     website = models.SlugField(
         unique=True, null=True, blank=True, max_length=100)
-    category = models.ManyToMany(BusinessCategory, null=True, blank=True)
+    categories = models.ManyToMany(BusinessCategory, null=True, blank=True)
     business_id = models.CharField(
         max_length=10, unique=True, blank=True, null=True)
     email_verified = models.BooleanField(default=False)

@@ -75,15 +75,13 @@ class LoginView(APIView):
 
 class BusinessAccountView(APIView):
     def post(self, request):
-        hours = request.data.get("hours")
         serializer = BusinessAccountSerializer(data=request.data)
+        data = {}
         if serializer.is_valid():
-            business = serializer.save(owner=request.user)
-            for hour in hours:
-                business_hours = BusinessHour.objects.create(
-                    business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
-            business_hours_serializer = BusinessHourSerializer(business_hours)
-            return Response(business_hours_serializer.data, status.HTTP_201_CREATED)
+            serializer.save()
+            data["message"] = "Account created successfully"
+            data["business"] = serializer.data
+            return Response(data, status.HTTP_201_CREATED)
         else:
             return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
 
