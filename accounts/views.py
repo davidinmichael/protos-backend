@@ -74,6 +74,11 @@ class LoginView(APIView):
 
 
 class BusinessAccountView(APIView):
+    def get(self, request):
+        business = BusinessAccount.objects.get(owner=request.user)
+        serializer = BusinessAccountSerializer(business)
+        return Response(serializer.data, status.HTTP_200_OK)
+    
     def post(self, request):
         serializer = BusinessAccountSerializer(data=request.data)
         data = {}
