@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 import re
 from .models import *
 from location.models import *
+from .utils import *
 
 
 class BusinessLocationSerializer(serializers.ModelSerializer):
@@ -26,13 +27,13 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
         slug_field="name", queryset=State.objects.all())
     country = serializers.SlugRelatedField(
         slug_field="name", queryset=City.objects.all())
-    location = UserLocationSerializer()
+    # location = UserLocationSerializer()
 
     class Meta:
         model = PersonalAccount
         fields = ["id", "first_name", "last_name", "username", "email", "country",
                   "state", "city", "user_id", "is_business_owner", "email_verified",
-                  "data_joined", "location"]
+                  "data_joined"]
 
         read_only_fields = ["id", "location"]
         write_only_fields = ["password"]
@@ -57,6 +58,11 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 "Password must contain at least one special character")
         return value
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["location"] = get_location()
+        return rep
 
 
 class BusinessCategorySerializer(serializers.ModelSerializer):
@@ -100,6 +106,8 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
         owner = validated_data.pop("owner")
         categories = validated_data.pop("categories", None)
         hours = validated_data.pop("hours", None)
+        location = validated_data.pop("location")
+        b_location = get_location()
 
         business_owner = PersonalAccount.objects.create(**owner)
         business = BusinessAccount.objects.create(
@@ -112,4 +120,6 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
             for hour in hours:
                 business_hours = BusinessHour.objects.create(
                     business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
+        business_location = BusinessLocation.objects.create(
+            business=business, latitude=b_location["latitude"], longitude=b_location["longitude"])
         return business
