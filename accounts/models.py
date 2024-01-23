@@ -121,6 +121,23 @@ class BusinessHour(models.Model):
     def __str__(self):
         return f"{self.business} | {self.open_time}"
 
+
+class UserLocation(models.Model):
+    user = models.ForeignKey(PersonalAccount, on_delete=models.CASCADE)
+    latitude = models.CharField(max_legnth=20, null=True, blank=True)
+    longitude = models.CharField(max_legnth=20, null=True, blank=True)
+
+    def _str__(self):
+        return f"{self.user} | {self.latitude}, {self.longitude}"
+
+class BusinessLocation(models.Model):
+    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    latitude = models.CharField(max_legnth=20, null=True, blank=True)
+    longitude = models.CharField(max_legnth=20, null=True, blank=True)
+
+    def _str__(self):
+        return f"{self.business} | {self.latitude}, {self.longitude}"
+
 # {
 #   "field1": "value1",
 #   "field2": "value2",
