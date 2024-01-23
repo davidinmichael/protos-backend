@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, EmailMultiAlternatives
+import ipinfo, os
 
 
 def token_send_email(user_email, email_subject, email_body, template):
@@ -24,3 +25,13 @@ def token_send_email(user_email, email_subject, email_body, template):
         return f"Couldn't connect, please, try again"
 
     return None
+
+
+ip_token = os.getenv("IPINFO_TOKEN")
+def get_location():
+    handler = ipinfo.getHandler(ip_token)
+    details = handler.getDetails()
+    data = {}
+    data["latitude"] = details.latitude
+    data["longitude"] = details.longitude
+    return data
