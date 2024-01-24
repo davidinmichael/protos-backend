@@ -60,7 +60,7 @@ class LoginView(APIView):
         try:
             user = PersonalAccount.objects.get(email=email)
         except PersonalAccount.DoesNotExist:
-            return Response({'error': 'User does not exist'}, status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "User does not exist"}, status.HTTP_400_BAD_REQUEST)
         if user.check_password(password):
             serializer = PersonalAccountSerializer(user)
             refresh = RefreshToken.for_user(user)

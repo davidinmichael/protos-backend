@@ -3,3 +3,4 @@ countries+states+cities.json
 nigeria.py
 db.sqlite3
 venv
+migrations

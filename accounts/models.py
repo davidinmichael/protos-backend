@@ -1,4 +1,3 @@
-from enum import unique
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
@@ -55,6 +54,8 @@ class PersonalAccount(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.user_id:
             self.user_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
+        if not self.username:
+            self.username = f"{self.first_name}{self.user_id}"
         return super().save(*args, **kwargs)
 
     def get_account_name(self):
@@ -73,6 +74,7 @@ class BusinessAccount(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
     contact_number = models.CharField(max_length=20, unique=True)
+    description = models.TextField(null=True, blank=True)
     country = models.ForeignKey(
         Country, null=True, blank=True, on_delete=models.SET_NULL)
     state = models.ForeignKey(
@@ -93,9 +95,6 @@ class BusinessAccount(models.Model):
         return f"{self.owner} | {self.name}"
 
     def save(self, *args, **kwargs):
-        if not self.owner.is_business_owner:
-            self.owner.is_business_owner = True
-            self.owner.save()
         if not self.business_id:
             self.business_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
@@ -112,7 +111,7 @@ class UserToken(models.Model):
 
 
 class BusinessHour(models.Model):
-    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, related_name="business_hours")
     day = models.CharField(max_length=10, null=True, blank=True)
     open_time = models.CharField(
         max_length=10, null=True, blank=True)  # "09:00:00"

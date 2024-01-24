@@ -83,11 +83,14 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
     owner = PersonalAccountSerializer()
     categories = BusinessCategorySerializer(many=True)
     hours = BusinessHourSerializer(many=True)
+    country = serializers.SlugRelatedField(slug_field="name", queryset=Country.objects.all())
+    state = serializers.SlugRelatedField(slug_field="name", queryset=State.objects.all())
+    city = serializers.SlugRelatedField(slug_field="name", queryset=City.objects.all())
     location = BusinessLocationSerializer()
 
     class Meta:
         model = BusinessAccount
-        fields = ["id", "owner", "name", "email", "contact_number", "country",
+        fields = ["id", "owner", "name", "email", "contact_number", "description", "country",
                   "state", "city", "postal_code", "address", "website",
                   "business_id", "email_verified", "data_joined", "categories",
                   "hours", "location"]
