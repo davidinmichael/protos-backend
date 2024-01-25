@@ -23,9 +23,14 @@ class CreateCountry(APIView):
             try:
                 Country.objects.get(name=place["name"])
             except Country.DoesNotExist:
-                country = Country.objects.create(name=place["name"], capital=place["capital"],
-                phone_code=place["phone_code"], currency=currency, iso2=place["iso2"],
-                iso3=place["iso3"])
+                country = Country.objects.create(name=place["name"],
+                capital=place["capital"],
+                phone_code=place["phone_code"],
+                currency=currency,
+                iso2=place["iso2"],
+                iso3=place["iso3"],
+                latitude=place["latitude"],
+                longitude=place["longitude"])
         return Response({"message": "All Countries created"})
 
 class CreateState(APIView):
@@ -36,30 +41,31 @@ class CreateState(APIView):
                 try:
                     State.objects.get(name=state["name"])
                 except State.DoesNotExist:
-                    states = State.objects.create(name=state["name"], state_code=state["state_code"],
-                    country=country)
+                    states = State.objects.create(name=state["name"],
+                    state_code=state["state_code"],
+                    country=country,
+                    latitude=state["latitude"],
+                    longitude=state["longitude"])
         return Response({"message": "All States created"})
 
 class CreateCity(APIView):
     def get(self, request):
         for place in places:
             for state in place["states"]:
-                state_instance = State.objects.get(name=state["name"])
+                state_instance = State.objects.get(state_code=state["state_code"])
                 for city in state["cities"]:
                     try:
-                        City.objects.get(name=state["name"])
+                        City.objects.get(identifier=city["id"])
                     except City.DoesNotExist:
-                        city = City.objects.create(name=city["name"], state=state_instance,
+                        city_instance = City.objects.create(name=city["name"], state=state_instance,
                         latitude=city["latitude"], longitude=city["longitude"])
-        return Response({"message": "All States created"})
+        return Response({"message": "All Cities created"})
 
 
 
 class CurrencyView(APIView):
     def get(self, request):
         """Used to create currency for the set country"""
-        # currency_c = Currency.objects.create(
-        #     name=nigeria["currency_name"], currency_symbol=nigeria["currency_symbol"], currency=nigeria["currency"])
         currency = Currency.objects.all()
         serializer = CurrencySerializer(currency, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -68,11 +74,6 @@ class CurrencyView(APIView):
 class CountryView(APIView):
     def get(self, request):
         """Returns a list of all countries available in our database."""
-        # currency_name = nigeria["currency_name"]
-        # currency_instance = Currency.objects.filter(name=currency_name).first()
-
-        # country_c = Country.objects.create(name=nigeria["name"], iso3=nigeria["iso3"], iso2=nigeria["iso2"],
-        #                                    phone_code=nigeria["phone_code"], capital=nigeria["capital"], currency=currency_instance)
         country = Country.objects.all()
         serializer = CountrySerializer(country, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -81,11 +82,6 @@ class CountryView(APIView):
 class StateView(APIView):
     def get(self, request):
         """Used to list all states, commented code for creating states"""
-        # country = nigeria["name"]
-        # country_instance = Country.objects.get(name=country)
-        # for state in nigeria["states"]:
-        #     State.objects.create(
-        #         name=state["name"], state_code=state["state_code"], country=country_instance)
         states = State.objects.all()
         serializer = StateSerializer(states, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -94,13 +90,11 @@ class StateView(APIView):
 class CityView(APIView):
     def get(self, request):
         """Used to list all cities, commented code for creating cities"""
-        # for state in nigeria["states"]:
-        #     state_q = State.objects.get(name=state["name"])
-        #     for city in state["cities"]:
-        #         city_c = City.objects.create(name=city["name"], state=state_q)
         cities = City.objects.all()
-        serializer = CitySerializer(cities, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        cities.delete()
+        # serializer = CitySerializer(cities, many=True)
+        return Response({"message": "Deleted"}, status.HTTP_200_OK)
+        # return Response(serializer.data, status.HTTP_200_OK)
 
 
 class CountryStateView(APIView):

@@ -14,6 +14,8 @@ class Country(models.Model):
     name = models.CharField(max_length=50, unique=True)
     capital = models.CharField(max_length=50)
     phone_code = models.CharField(max_length=10, null=True, blank=True)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
     currency = models.ForeignKey(
         Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name="country_currencies")
     iso2 = models.CharField(max_length=3, unique=True)
@@ -34,6 +36,9 @@ class Country(models.Model):
 
 class State(models.Model):
     name = models.CharField(max_length=50)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
+    identifier = models.CharField(max_length=10, null=True, blank=True)
     state_code = models.CharField(
         max_length=5, null=True, blank=True)
     country = models.ForeignKey(
