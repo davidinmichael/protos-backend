@@ -9,8 +9,6 @@ class CurrencySerializer(serializers.ModelSerializer):
 
 
 class CountrySerializer(serializers.ModelSerializer):
-    # currency = serializers.SlugRelatedField(
-    #     slug_field="name", queryset=Currency.objects.all())
     currency = CurrencySerializer()
 
     class Meta:
@@ -24,8 +22,9 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class StateSerializer(serializers.ModelSerializer):
-    country = serializers.SlugRelatedField(
-        slug_field="name", queryset=Country.objects.all())
+    # country = serializers.SlugRelatedField(
+    #     slug_field="name", queryset=Country.objects.all())
+    country = CountrySerializer()
 
     class Meta:
         model = State
