@@ -118,3 +118,4 @@ class BusinessListings(APIView):
 
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)
+

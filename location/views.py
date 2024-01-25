@@ -5,6 +5,54 @@ from rest_framework import status
 from .nigeria import nigeria
 from .models import *
 from .serializers import *
+from .places import places
+
+class CreateCurrency(APIView):
+    def get(self, request):
+        for place in places:
+            try:
+                currency_instance = Currency.objects.get(name=place["currency_name"])
+            except Currency.DoesNotExist:
+                currency = Currency.objects.create(name=place["currency_name"], currency_symbol=place["currency_symbol"], currency=place["currency"])
+        return Response({"message": "All currency created"})
+
+class CreateCountry(APIView):
+    def get(self, request):
+        for place in places:
+            currency = Currency.objects.get(name=place["currency_name"])
+            try:
+                Country.objects.get(name=place["name"])
+            except Country.DoesNotExist:
+                country = Country.objects.create(name=place["name"], capital=place["capital"],
+                phone_code=place["phone_code"], currency=currency, iso2=place["iso2"],
+                iso3=place["iso3"])
+        return Response({"message": "All Countries created"})
+
+class CreateState(APIView):
+    def get(self, request):
+        for place in places:
+            country = Country.objects.get(name=place["name"])
+            for state in place["states"]:
+                try:
+                    State.objects.get(name=state["name"])
+                except State.DoesNotExist:
+                    states = State.objects.create(name=state["name"], state_code=state["state_code"],
+                    country=country)
+        return Response({"message": "All States created"})
+
+class CreateCity(APIView):
+    def get(self, request):
+        for place in places:
+            for state in place["states"]:
+                state_instance = State.objects.get(name=state["name"])
+                for city in state["cities"]:
+                    try:
+                        City.objects.get(name=state["name"])
+                    except City.DoesNotExist:
+                        city = City.objects.create(name=city["name"], state=state_instance,
+                        latitude=city["latitude"], longitude=city["longitude"])
+        return Response({"message": "All States created"})
+
 
 
 class CurrencyView(APIView):

@@ -85,7 +85,7 @@ class BusinessAccount(models.Model):
     address = models.CharField(max_length=100, null=True, blank=True)
     website = models.SlugField(
         unique=True, null=True, blank=True, max_length=100)
-    categories = models.ManyToMany(BusinessCategory, null=True, blank=True)
+    categories = models.ManyToManyField(BusinessCategory, blank=True)
     business_id = models.CharField(
         max_length=10, unique=True, blank=True, null=True)
     email_verified = models.BooleanField(default=False)
@@ -123,16 +123,16 @@ class BusinessHour(models.Model):
 
 class UserLocation(models.Model):
     user = models.ForeignKey(PersonalAccount, on_delete=models.CASCADE)
-    latitude = models.CharField(max_legnth=20, null=True, blank=True)
-    longitude = models.CharField(max_legnth=20, null=True, blank=True)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
 
     def _str__(self):
         return f"{self.user} | {self.latitude}, {self.longitude}"
 
 class BusinessLocation(models.Model):
     business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
-    latitude = models.CharField(max_legnth=20, null=True, blank=True)
-    longitude = models.CharField(max_legnth=20, null=True, blank=True)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
 
     def _str__(self):
         return f"{self.business} | {self.latitude}, {self.longitude}"

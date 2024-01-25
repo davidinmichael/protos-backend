@@ -2,9 +2,9 @@ from django.db import models
 
 
 class Currency(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    currency = models.CharField(max_length=10, unique=True)
-    currency_symbol = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
+    currency = models.CharField(max_length=10)
+    currency_symbol = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.name} | {self.currency_symbol}"
@@ -12,8 +12,8 @@ class Currency(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    capital = models.CharField(max_length=50, unique=True)
-    phone_code = models.IntegerField(null=True, blank=True)
+    capital = models.CharField(max_length=50)
+    phone_code = models.CharField(max_length=10, null=True, blank=True)
     currency = models.ForeignKey(
         Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name="country_currencies")
     iso2 = models.CharField(max_length=3, unique=True)
@@ -33,9 +33,9 @@ class Country(models.Model):
 
 
 class State(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     state_code = models.CharField(
-        max_length=5, unique=True, null=True, blank=True)
+        max_length=5, null=True, blank=True)
     country = models.ForeignKey(
         Country, on_delete=models.CASCADE, related_name="country_states")
 
@@ -45,6 +45,8 @@ class State(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=50)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
     state = models.ForeignKey(
         State, on_delete=models.CASCADE, related_name="state_cities")
 
