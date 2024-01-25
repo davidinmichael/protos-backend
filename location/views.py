@@ -49,6 +49,8 @@ class CreateState(APIView):
                     identifier=state["id"])
         return Response({"message": "All States created"})
 
+
+# Creating Cities for supported countries
 class CreateCity(APIView):
     def get(self, request):
         for state in nigeria["states"]:
