@@ -80,7 +80,7 @@ class CreateCity(APIView):
 
 class CurrencyView(APIView):
     def get(self, request):
-        """Used to create currency for the set country"""
+        """Returns all currencies available in our database."""
         currency = Currency.objects.all()
         serializer = CurrencySerializer(currency, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -96,7 +96,7 @@ class CountryView(APIView):
 
 class StateView(APIView):
     def get(self, request):
-        """Used to list all states, commented code for creating states"""
+        """Used to list all states"""
         states = State.objects.all()
         serializer = StateSerializer(states, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -104,12 +104,10 @@ class StateView(APIView):
 
 class CityView(APIView):
     def get(self, request):
-        """Used to list all cities, commented code for creating cities"""
+        """Used to list all cities"""
         cities = City.objects.all()
         serializer = CitySerializer(cities, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
-        # cities.delete()
-        # return Response({"message": "Deleted"}, status.HTTP_200_OK)
 
 
 class CountryStateView(APIView):
