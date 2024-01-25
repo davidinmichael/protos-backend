@@ -45,21 +45,34 @@ class CreateState(APIView):
                     state_code=state["state_code"],
                     country=country,
                     latitude=state["latitude"],
-                    longitude=state["longitude"])
+                    longitude=state["longitude"],
+                    identifier=state["id"])
         return Response({"message": "All States created"})
 
 class CreateCity(APIView):
     def get(self, request):
-        for place in places:
-            for state in place["states"]:
-                state_instance = State.objects.get(state_code=state["state_code"])
-                for city in state["cities"]:
-                    try:
-                        City.objects.get(identifier=city["id"])
-                    except City.DoesNotExist:
-                        city_instance = City.objects.create(name=city["name"], state=state_instance,
-                        latitude=city["latitude"], longitude=city["longitude"])
+        for state in nigeria["states"]:
+            state_instance = State.objects.get(name=state["name"])
+            for city in state["cities"]:
+                try:
+                    City.objects.get(name=city["name"])
+                except City.DoesNotExist:
+                    city_instance = City.objects.create(name=city["name"], state=state_instance,
+                    latitude=city["latitude"], longitude=city["longitude"])
         return Response({"message": "All Cities created"})
+
+# class CreateCity(APIView):
+#     def get(self, request):
+#         for place in places:
+#             for state in place["states"]:
+#                 state_instance = State.objects.get(identifier=state["id"])
+#                 for city in state["cities"]:
+#                     try:
+#                         City.objects.get(name=city["name"])
+#                     except City.DoesNotExist:
+#                         city_instance = City.objects.create(name=city["name"], state=state_instance,
+#                         latitude=city["latitude"], longitude=city["longitude"])
+#         return Response({"message": "All Cities created"})
 
 
 
@@ -91,10 +104,10 @@ class CityView(APIView):
     def get(self, request):
         """Used to list all cities, commented code for creating cities"""
         cities = City.objects.all()
-        cities.delete()
-        # serializer = CitySerializer(cities, many=True)
-        return Response({"message": "Deleted"}, status.HTTP_200_OK)
-        # return Response(serializer.data, status.HTTP_200_OK)
+        serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+        # cities.delete()
+        # return Response({"message": "Deleted"}, status.HTTP_200_OK)
 
 
 class CountryStateView(APIView):
