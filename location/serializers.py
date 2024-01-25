@@ -13,7 +13,8 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = "__all__"
+        fields = ["name", "capital", "phone_code", "latitude", "longitude",
+                  "iso2", "iso3", "flag", "currency"]
     
     def to_representation(self, instance):
         country = super().to_representation(instance)
@@ -22,13 +23,12 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class StateSerializer(serializers.ModelSerializer):
-    # country = serializers.SlugRelatedField(
-    #     slug_field="name", queryset=Country.objects.all())
     country = CountrySerializer()
 
     class Meta:
         model = State
-        fields = "__all__"
+        fields = ["name", "latitude", "longitude", "identifier", "state_code",
+                  "country"]
 
 
 class CitySerializer(serializers.ModelSerializer):
