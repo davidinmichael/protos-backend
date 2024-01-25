@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api_schema/", get_schema_view(title="Protos API Endpoints",
                                         description="The endpoints for API services",
-                                        version=1.0, name="api_schema")),
+                                        version=1.0), name="api_schema"),
     path("api_docs/", TemplateView.as_view(template_name="api_endpoints.html",
                                            extra_context={
                                                "schema_url": "api_schema"
