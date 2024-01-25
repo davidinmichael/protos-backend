@@ -13,7 +13,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ["name", "capital", "phone_code", "latitude", "longitude",
+        fields = ["id", "name", "capital", "phone_code", "latitude", "longitude",
                   "iso2", "iso3", "flag", "currency"]
     
     def to_representation(self, instance):
@@ -27,7 +27,7 @@ class StateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = State
-        fields = ["name", "latitude", "longitude", "identifier", "state_code",
+        fields = ["id", "name", "latitude", "longitude", "identifier", "state_code",
                   "country"]
 
 
