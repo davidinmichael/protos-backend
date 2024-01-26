@@ -93,6 +93,29 @@ class SendToken(APIView):
         return Response({"message": "A verification code has been sent to your email."})
 
 
+class ResetPassword(APIView):
+    def post(self, request):
+        token = request.data.get("token")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        confirm_password = request.data.get("confirm_password")
+        try:
+            user = PersonalAccount.objects.get(email=email)
+            user_token = UserToken.objects.get(token=token)
+        except UserToken.DoesNotExist:
+            return Response({"message": "Invalid Token"}, status.HTTP_400_BAD_REQUEST)
+        if user_token.user == user:
+            if password == confirm_password:
+                user.set_password(password)
+                return Response({"message": "Password reset succesfully, continue to login."},
+                                status.HTTP_200_OK)
+            else:
+                return Response({"message": "Passwords do not match"},
+                                status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "Invalid token"}, status.HTTP_400_BAD_REQUEST)
+
+
 class BusinessAccountView(APIView):
     def get(self, request):
         business = BusinessAccount.objects.get(owner=request.user)
