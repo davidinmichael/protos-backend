@@ -26,7 +26,7 @@ class PersonalAccountView(APIView):
                     "token": user_token.token
                 }
                 template = render_to_string(
-                    "account/welcome_email.html", context)
+                    "account/email_token.html", context)
                 token_send_email(user.email, "Verify Email",
                                  user_token.token, template)
             else:
@@ -73,12 +73,32 @@ class LoginView(APIView):
             return Response({'error': 'Wrong Password'}, status.HTTP_400_BAD_REQUEST)
 
 
+class SendToken(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = PersonalAccount.objects.get(email=email)
+        except PersonalAccount.DoesNotExist:
+            return Response({"message": "User with this email does not exist"},
+                            status.HTTP_400_BAD_REQUEST)
+        user_token = UserToken.objects.create(user=user)
+        context = {
+            'name': user.get_account_name(),
+            "token": user_token.token
+        }
+        template = render_to_string(
+            "account/email_token.html", context)
+        token_send_email(user.email, "Password Reset",
+                         user_token.token, template)
+        return Response({"message": "A verification code has been sent to your email."})
+
+
 class BusinessAccountView(APIView):
     def get(self, request):
         business = BusinessAccount.objects.get(owner=request.user)
         serializer = BusinessAccountSerializer(business)
         return Response(serializer.data, status.HTTP_200_OK)
-    
+
     def post(self, request):
         serializer = BusinessAccountSerializer(data=request.data)
         data = {}
@@ -118,4 +138,3 @@ class BusinessListings(APIView):
 
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)
-
