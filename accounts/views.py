@@ -16,22 +16,18 @@ class PersonalAccountView(APIView):
         data = {}
         if serializer.is_valid:
             user = serializer.save()
+            user_token = UserToken.objects.create(user=user)
+            context = {
+                'name': user.get_account_name(),
+                "token": user_token.token
+            }
+            template = render_to_string(
+                "account/email_token.html", context)
+            token_send_email(user.email, "Verify Email",
+                                user_token.token, template)
             refresh = RefreshToken.for_user(user)
             data['access'] = str(refresh.access_token)
-            data['refresh'] = str(refresh)
-            if user.is_business_owner:
-                user_token = UserToken.objects.create(user=user)
-                context = {
-                    'name': user.get_account_name(),
-                    "token": user_token.token
-                }
-                template = render_to_string(
-                    "account/email_token.html", context)
-                token_send_email(user.email, "Verify Email",
-                                 user_token.token, template)
-            else:
-                data["name"] = f"Hello {user.first_name},"
-                data["message"] = "Your Account is created successfully. Continue to Login"
+            data['refresh'] = str(refresh)            
             return Response(data, status.HTTP_201_CREATED)
         else:
             return (serializer.errors, status.HTTP_403_FORBIDDEN)
