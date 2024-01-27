@@ -150,3 +150,5 @@ class BusinessLocation(models.Model):
 #       {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"},
 #   ]
 # }
+    
+

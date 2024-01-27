@@ -25,7 +25,7 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
         slug_field="name", queryset=Country.objects.all())
     state = serializers.SlugRelatedField(
         slug_field="name", queryset=State.objects.all())
-    country = serializers.SlugRelatedField(
+    city = serializers.SlugRelatedField(
         slug_field="name", queryset=City.objects.all())
     # location = UserLocationSerializer()
 
@@ -33,7 +33,7 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
         model = PersonalAccount
         fields = ["id", "first_name", "last_name", "username", "email", "country",
                   "state", "city", "user_id", "is_business_owner", "email_verified",
-                  "data_joined"]
+                  "date_joined"]
 
         read_only_fields = ["id", "location"]
         write_only_fields = ["password"]
