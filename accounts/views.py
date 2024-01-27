@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
+from rest_framework.permissions import AllowAny
 
 from .serializers import *
 from .models import *
@@ -11,10 +12,12 @@ from .utils import *
 
 
 class PersonalAccountView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = PersonalAccountSerializer(data=request.data)
         data = {}
-        if serializer.is_valid:
+        if serializer.is_valid():
             user = serializer.save()
             user_token = UserToken.objects.create(user=user)
             context = {
@@ -49,6 +52,8 @@ class VerifyEmail(APIView):
 
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -70,6 +75,8 @@ class LoginView(APIView):
 
 
 class SendToken(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
         try:
@@ -90,6 +97,8 @@ class SendToken(APIView):
 
 
 class ResetPassword(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         token = request.data.get("token")
         email = request.data.get("email")
@@ -113,6 +122,8 @@ class ResetPassword(APIView):
 
 
 class BusinessAccountView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
         business = BusinessAccount.objects.get(owner=request.user)
         serializer = BusinessAccountSerializer(business)

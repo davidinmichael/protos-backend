@@ -42,7 +42,7 @@ class PersonalAccount(AbstractUser):
     is_business_owner = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
     date_joined = models.DateField(default=timezone.now)
-
+    
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

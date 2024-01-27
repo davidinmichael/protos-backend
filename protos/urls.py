@@ -17,6 +17,7 @@ urlpatterns = [
                                            })),
 
     path("location/", include("location.urls")),
+    path("account/", include("accounts.urls")),
 ]
 
 if settings.DEBUG:

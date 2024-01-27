@@ -35,17 +35,8 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
                   "state", "city", "user_id", "is_business_owner", "email_verified",
                   "date_joined"]
 
-        read_only_fields = ["id", "location"]
+        read_only_fields = ["id"]
         write_only_fields = ["password"]
-
-    def validate_country(self, value):
-        return Country.objects.get(name=value)
-
-    def validate_state(self, value):
-        return State.objects.get(name=value)
-
-    def validate_city(self, value):
-        return City.objects.get(name=value)
 
     def validate_password(self, value):
         if len(value) < 8:
@@ -58,6 +49,10 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 "Password must contain at least one special character")
         return value
+    
+    def create(self, validated_data):
+        user = PersonalAccount.objects.create_user(**validated_data)
+        return user
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
