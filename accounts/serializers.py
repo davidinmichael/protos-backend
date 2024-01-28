@@ -50,6 +50,11 @@ class PersonalAccountSerializer(serializers.ModelSerializer):
                 "Password must contain at least one special character")
         return value
     
+    def validate_email(self, value):
+        if PersonalAccount.objects.filter(email=value).exists():
+            raise ValidationError("User with this email already exist")
+        return value
+    
     def create(self, validated_data):
         user = PersonalAccount.objects.create_user(**validated_data)
         return user

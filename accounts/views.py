@@ -14,20 +14,17 @@ from .utils import *
 class PersonalAccountView(APIView):
     permission_classes = [AllowAny]
 
+    def get(self, request):
+        accounts = PersonalAccount.objects.all()
+        serializer = PersonalAccountSerializer(accounts, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
     def post(self, request):
         serializer = PersonalAccountSerializer(data=request.data)
         data = {}
         if serializer.is_valid():
             user = serializer.save()
             user_token = UserToken.objects.create(user=user)
-            context = {
-                'name': user.get_account_name(),
-                "token": user_token.token
-            }
-            template = render_to_string(
-                "account/email_token.html", context)
-            token_send_email(user.email, "Verify Email",
-                                user_token.token, template)
             refresh = RefreshToken.for_user(user)
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)            
