@@ -5,13 +5,13 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 import ipinfo, os
 
 
-def token_send_email(user_email, email_subject, email_body, template):
+def token_send_email(user_email, email_subject, template):
     from_email = settings.EMAIL_HOST_USER
     to_email = [user_email]
 
     email = EmailMultiAlternatives(
         subject=email_subject,
-        body=email_body,
+        body=template,
         from_email=from_email,
         to=to_email,
     )

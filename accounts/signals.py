@@ -16,7 +16,7 @@ def send_welcome_email(sender, instance, created, **kwargs):
     if created:
         try:
             token_send_email(instance.email, "Verify Email",
-                             user_token, template)
+                             template)
             print("Email sent to", instance.email)
             print("This is the token:", user_token)
         except:
