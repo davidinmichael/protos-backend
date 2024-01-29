@@ -24,7 +24,6 @@ class PersonalAccountView(APIView):
         data = {}
         if serializer.is_valid():
             user = serializer.save()
-            # user_token = UserToken.objects.create(user=user)
             refresh = RefreshToken.for_user(user)
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)            
@@ -57,9 +56,11 @@ class LoginView(APIView):
         data = {}
         try:
             user = PersonalAccount.objects.get(email=email)
+            print("password:", user.password)
         except PersonalAccount.DoesNotExist:
             return Response({"error": "User does not exist"}, status.HTTP_400_BAD_REQUEST)
         if user.check_password(password):
+            print("new-password entered", password)
             serializer = PersonalAccountSerializer(user)
             refresh = RefreshToken.for_user(user)
             data["message"] = "Login Successfull"
@@ -68,6 +69,7 @@ class LoginView(APIView):
             data['refresh'] = str(refresh)
             return Response(data, status.HTTP_200_OK)
         else:
+            print("new-password-error", password)
             return Response({'error': 'Wrong Password'}, status.HTTP_400_BAD_REQUEST)
 
 
@@ -89,7 +91,7 @@ class SendToken(APIView):
         template = render_to_string(
             "account/email_token.html", context)
         token_send_email(user.email, "Password Reset",
-                         user_token.token, template)
+                         template)
         return Response({"message": "A verification code has been sent to your email."})
 
 
