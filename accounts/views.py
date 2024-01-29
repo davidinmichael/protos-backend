@@ -24,7 +24,7 @@ class PersonalAccountView(APIView):
         data = {}
         if serializer.is_valid():
             user = serializer.save()
-            user_token = UserToken.objects.create(user=user)
+            # user_token = UserToken.objects.create(user=user)
             refresh = RefreshToken.for_user(user)
             data['access'] = str(refresh.access_token)
             data['refresh'] = str(refresh)            

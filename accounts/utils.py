@@ -1,3 +1,4 @@
+from sys import exception
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, EmailMultiAlternatives
@@ -30,7 +31,10 @@ def token_send_email(user_email, email_subject, email_body, template):
 ip_token = os.getenv("IPINFO_TOKEN")
 def get_location():
     handler = ipinfo.getHandler(ip_token)
-    details = handler.getDetails()
+    try:
+        details = handler.getDetails()
+    except Exception as e:
+        return "Couldn't get Location"
     data = {}
     data["latitude"] = details.latitude
     data["longitude"] = details.longitude

@@ -42,7 +42,7 @@ class PersonalAccount(AbstractUser):
     is_business_owner = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
     date_joined = models.DateField(default=timezone.now)
-    
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
@@ -108,6 +108,9 @@ class UserToken(models.Model):
         if not self.token:
             self.token = str(uuid.uuid4()).replace('-', "").upper()[:4]
         return super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.token
 
 
 class BusinessHour(models.Model):
