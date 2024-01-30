@@ -148,26 +148,26 @@ class BusinessListings(APIView):
     def get(self, request):
         data = {}
         user = request.user
-        user_details = PersonalAccount.objects.get(email=request.user.email)
-        serializer = PersonalAccountSerializer(user_details)
+        # user_details = PersonalAccount.objects.get(email=request.user.email)
+        serializer = PersonalAccountSerializer(user)
         city_businesses = BusinessAccount.objects.filter(city=user.city.name)
         city_businesses_serializer = BusinessHourSerializer(
             city_businesses, many=True)
         data["city_businesses"] = city_businesses_serializer.data
 
-        if city_businesses.count() < 50:
-            state_businesses = BusinessAccount.objects.filter(
-                state=user.state.name)
-            state_businesses_serializer = BusinessHourSerializer(
-                state_businesses, many=True)
-            data["state_businesses"] = state_businesses_serializer.data
+        # if city_businesses.count() < 50:
+        #     state_businesses = BusinessAccount.objects.filter(
+        #         state=user.state.name)
+        #     state_businesses_serializer = BusinessHourSerializer(
+        #         state_businesses, many=True)
+        #     data["state_businesses"] = state_businesses_serializer.data
 
-            if state_businesses.count() < 50:
-                country_businesses = BusinessAccount.objects.filter(
-                    country=user.country.name)
-                country_business_serializer = BusinessHourSerializer(
-                    country_businesses, many=True)
-                data["country_businesses"] = country_business_serializer.data
+        #     if state_businesses.count() < 50:
+        #         country_businesses = BusinessAccount.objects.filter(
+        #             country=user.country.name)
+        #         country_business_serializer = BusinessHourSerializer(
+        #             country_businesses, many=True)
+        #         data["country_businesses"] = country_business_serializer.data
 
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)

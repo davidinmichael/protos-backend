@@ -10,4 +10,5 @@ urlpatterns = [
     path("reset-password/", ResetPassword.as_view()),
 
     path("business-account/", BusinessAccountView.as_view()),
+    path("business-listings/", BusinessListings.as_view()),
 ]

@@ -144,29 +144,8 @@ class BusinessLocation(models.Model):
         return f"{self.business.name} | {self.latitude}, {self.longitude}"
 
 # {
-#   "owner": {
-#     "email": "dadvantech@gmail.com",
-#     "password": "Front@1234",
-#     "country": "Nigeria",
-#     "state": "Abia",
-#     "city": "Aba"
-#   },
-#   "categories": [
-#     {"name": "Restaurant"},
-#     {"name": "Bar"}
-#     ],
-#   "hours": [
-#       {"day":"Monday", "open_time":"08:00 AM", "close_time":"17:00 PM"},
-#       {"day":"Tuesday", "open_time":"08:00 AM", "close":"17:00 PM"},
-#       {"day":"Wednessday", "open_time":"08:00 AM", "close":"17:00 PM"},
-#       {"day":"Thursday", "open_time":"08:00 AM", "close":"17:00 PM"},
-#       {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"}
-#   ],
-#   "country": "Nigeria",
-#   "state": "Abia",
-#   "city": "Aba",
-#   "name": "iLight Wears",
-#   "email": "ilghtwears@gmail.com",
-#   "contact_number": "+2348140980792"
+#     "email": "davidinmichael@gmail.com",
+#     "token": 3211,
+#     "password": "testpass",
+#     "confirm_password": "Frontend@123"
 # }
-
