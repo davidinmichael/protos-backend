@@ -59,7 +59,8 @@ class LoginView(APIView):
             print("password:", user.password)
         except PersonalAccount.DoesNotExist:
             return Response({"error": "User does not exist"}, status.HTTP_400_BAD_REQUEST)
-        if user.check_password(password):
+        # if user.check_password(password):
+        if user.password == password:
             print("new-password entered", password)
             serializer = PersonalAccountSerializer(user)
             refresh = RefreshToken.for_user(user)
