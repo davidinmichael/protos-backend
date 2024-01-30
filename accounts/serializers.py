@@ -7,6 +7,7 @@ from .utils import *
 
 
 class BusinessLocationSerializer(serializers.ModelSerializer):
+    business = serializers.SlugRelatedField(slug_field="name", queryset=BusinessAccount.objects.all())
     class Meta:
         model = BusinessLocation
         fields = "__all__"
@@ -86,20 +87,19 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
     country = serializers.SlugRelatedField(slug_field="name", queryset=Country.objects.all())
     state = serializers.SlugRelatedField(slug_field="name", queryset=State.objects.all())
     city = serializers.SlugRelatedField(slug_field="name", queryset=City.objects.all())
-    location = BusinessLocationSerializer(read_only=True)
 
     class Meta:
         model = BusinessAccount
         fields = ["id", "owner", "name", "email", "contact_number", "description", "country",
                   "state", "city", "postal_code", "address", "website",
-                  "business_id", "email_verified", "date_joined", "categories", "location"]
-        read_only_fields = ["id", "location"]
+                  "business_id", "email_verified", "date_joined", "categories"]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
         owner = validated_data.pop("owner")
         categories = validated_data.pop("categories", None)
         hours = self.context['request'].data.get("hours")
-        # location = self.context["request"].data.get("location")
+        location = self.context["request"].data.get("location")
 
         business_owner = PersonalAccount.objects.create_user(**owner)
         business = BusinessAccount.objects.create(
@@ -112,12 +112,14 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
             for hour in hours:
                 business_hours = BusinessHour.objects.create(
                     business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
-        # business_location = BusinessLocation.objects.create(
-        #     business=business, latitude=location["latitude"], longitude=location["longitude"])
+        business_location = BusinessLocation.objects.create(
+            business=business, latitude=location["latitude"], longitude=location["longitude"])
         return business
     
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         hours = instance.business_hours.all()
+        location = BusinessLocation.objects.get(business=instance)
+        rep["location"] = BusinessLocationSerializer(location).data
         rep["hours"] = BusinessHourSerializer(hours, many=True).data
         return rep

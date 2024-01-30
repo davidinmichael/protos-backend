@@ -126,8 +126,6 @@ class BusinessAccountView(APIView):
         data = {}
         business = BusinessAccount.objects.get(owner=request.user)
         serializer = BusinessAccountSerializer(business)
-        # business_owner = PersonalAccountSerializer(request.user)
-        # data["business_owner"] = business_owner.data
         data["business"] = serializer.data
         return Response(data, status.HTTP_200_OK)
 

@@ -132,16 +132,16 @@ class UserLocation(models.Model):
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)
 
-    def _str__(self):
-        return f"{self.user} | {self.latitude}, {self.longitude}"
+    def __str__(self):
+        return f"{self.user.email} | {self.latitude}, {self.longitude}"
 
 class BusinessLocation(models.Model):
     business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)
 
-    def _str__(self):
-        return f"{self.business} | {self.latitude}, {self.longitude}"
+    def __str__(self):
+        return f"{self.business.name} | {self.latitude}, {self.longitude}"
 
 # {
 #   "owner": {
