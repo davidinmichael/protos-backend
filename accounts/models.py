@@ -41,7 +41,7 @@ class PersonalAccount(AbstractUser):
         max_length=10, unique=True, blank=True, null=True)
     is_business_owner = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
-    date_joined = models.DateField(default=timezone.now)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -89,12 +89,15 @@ class BusinessAccount(models.Model):
     business_id = models.CharField(
         max_length=10, unique=True, blank=True, null=True)
     email_verified = models.BooleanField(default=False)
-    date_joined = models.DateField(default=timezone.now)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.owner} | {self.name}"
 
     def save(self, *args, **kwargs):
+        if not self.owner.is_business_owner:
+            self.owner.is_business_owner = True
+            self.owner.save()
         if not self.business_id:
             self.business_id = str(uuid.uuid4()).replace('-', "").upper()[:7]
         return super().save(*args, **kwargs)
@@ -114,7 +117,7 @@ class UserToken(models.Model):
 
 
 class BusinessHour(models.Model):
-    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, related_name="business_hours")
+    business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, blank=True, null=True, related_name="business_hours")
     day = models.CharField(max_length=10, null=True, blank=True)
     open_time = models.CharField(
         max_length=10, null=True, blank=True)  # "09:00:00"
@@ -141,17 +144,29 @@ class BusinessLocation(models.Model):
         return f"{self.business} | {self.latitude}, {self.longitude}"
 
 # {
-#   "field1": "value1",
-#   "field2": "value2",
-#   "field3": "value3",
-#   "extra_field": "additional_value",
+#   "owner": {
+#     "email": "dadvantech@gmail.com",
+#     "password": "Front@1234",
+#     "country": "Nigeria",
+#     "state": "Abia",
+#     "city": "Aba"
+#   },
+#   "categories": [
+#     {"name": "Restaurant"},
+#     {"name": "Bar"}
+#     ],
 #   "hours": [
 #       {"day":"Monday", "open_time":"08:00 AM", "close_time":"17:00 PM"},
 #       {"day":"Tuesday", "open_time":"08:00 AM", "close":"17:00 PM"},
 #       {"day":"Wednessday", "open_time":"08:00 AM", "close":"17:00 PM"},
 #       {"day":"Thursday", "open_time":"08:00 AM", "close":"17:00 PM"},
-#       {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"},
-#   ]
+#       {"day":"Friday", "open_time":"08:00 AM", "close":"17:00 PM"}
+#   ],
+#   "country": "Nigeria",
+#   "state": "Abia",
+#   "city": "Aba",
+#   "name": "iLight Wears",
+#   "email": "ilghtwears@gmail.com",
+#   "contact_number": "+2348140980792"
 # }
-    
 

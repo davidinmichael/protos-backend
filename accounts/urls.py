@@ -8,4 +8,6 @@ urlpatterns = [
     path("login/", LoginView.as_view()),
     path("send-token/", SendToken.as_view()),
     path("reset-password/", ResetPassword.as_view()),
+
+    path("business-account/", BusinessAccountView.as_view()),
 ]

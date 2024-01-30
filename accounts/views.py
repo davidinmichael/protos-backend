@@ -56,10 +56,8 @@ class LoginView(APIView):
         data = {}
         try:
             user = PersonalAccount.objects.get(email=email)
-            print("password:", user.password)
         except PersonalAccount.DoesNotExist:
             return Response({"error": "User does not exist"}, status.HTTP_400_BAD_REQUEST)
-        # if user.check_password(password):
         if user.password == password:
             print("new-password entered", password)
             serializer = PersonalAccountSerializer(user)
@@ -125,20 +123,27 @@ class BusinessAccountView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        data = {}
         business = BusinessAccount.objects.get(owner=request.user)
         serializer = BusinessAccountSerializer(business)
-        return Response(serializer.data, status.HTTP_200_OK)
+        # business_owner = PersonalAccountSerializer(request.user)
+        # data["business_owner"] = business_owner.data
+        data["business"] = serializer.data
+        return Response(data, status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = BusinessAccountSerializer(data=request.data)
+        serializer = BusinessAccountSerializer(data=request.data, context={'request': request})
         data = {}
         if serializer.is_valid():
-            serializer.save()
+            business = serializer.save()
+            refresh = RefreshToken.for_user(business.owner)
             data["message"] = "Account created successfully"
             data["business"] = serializer.data
+            data['access'] = str(refresh.access_token)
+            data['refresh'] = str(refresh)
             return Response(data, status.HTTP_201_CREATED)
         else:
-            return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
 class BusinessListings(APIView):

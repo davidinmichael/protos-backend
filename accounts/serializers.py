@@ -73,6 +73,7 @@ class BusinessCategorySerializer(serializers.ModelSerializer):
 
 
 class BusinessHourSerializer(serializers.ModelSerializer):
+    business = serializers.SlugRelatedField(slug_field="name", queryset=BusinessAccount.objects.all())
     class Meta:
         model = BusinessHour
         fields = "__all__"
@@ -82,37 +83,25 @@ class BusinessHourSerializer(serializers.ModelSerializer):
 class BusinessAccountSerializer(serializers.ModelSerializer):
     owner = PersonalAccountSerializer()
     categories = BusinessCategorySerializer(many=True)
-    hours = BusinessHourSerializer(many=True)
     country = serializers.SlugRelatedField(slug_field="name", queryset=Country.objects.all())
     state = serializers.SlugRelatedField(slug_field="name", queryset=State.objects.all())
     city = serializers.SlugRelatedField(slug_field="name", queryset=City.objects.all())
-    location = BusinessLocationSerializer()
+    location = BusinessLocationSerializer(read_only=True)
 
     class Meta:
         model = BusinessAccount
         fields = ["id", "owner", "name", "email", "contact_number", "description", "country",
                   "state", "city", "postal_code", "address", "website",
-                  "business_id", "email_verified", "data_joined", "categories",
-                  "hours", "location"]
+                  "business_id", "email_verified", "date_joined", "categories", "location"]
         read_only_fields = ["id", "location"]
-
-    def validate_country(self, value):
-        return Country.objects.get(name=value)
-
-    def validate_state(self, value):
-        return State.objects.get(name=value)
-
-    def validate_city(self, value):
-        return City.objects.get(name=value)
 
     def create(self, validated_data):
         owner = validated_data.pop("owner")
         categories = validated_data.pop("categories", None)
-        hours = validated_data.pop("hours", None)
-        location = validated_data.pop("location")
-        b_location = get_location()
+        hours = self.context['request'].data.get("hours")
+        # location = self.context["request"].data.get("location")
 
-        business_owner = PersonalAccount.objects.create(**owner)
+        business_owner = PersonalAccount.objects.create_user(**owner)
         business = BusinessAccount.objects.create(
             owner=business_owner, **validated_data)
         if categories is not None:
@@ -123,6 +112,12 @@ class BusinessAccountSerializer(serializers.ModelSerializer):
             for hour in hours:
                 business_hours = BusinessHour.objects.create(
                     business=business, day=hour["day"], open_time=hour["open_time"], close_time=hour["close_time"])
-        business_location = BusinessLocation.objects.create(
-            business=business, latitude=b_location["latitude"], longitude=b_location["longitude"])
+        # business_location = BusinessLocation.objects.create(
+        #     business=business, latitude=location["latitude"], longitude=location["longitude"])
         return business
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        hours = instance.business_hours.all()
+        rep["hours"] = BusinessHourSerializer(hours, many=True).data
+        return rep
