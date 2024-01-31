@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from requests import delete
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -26,7 +27,7 @@ class PersonalAccountView(APIView):
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             data['access'] = str(refresh.access_token)
-            data['refresh'] = str(refresh)            
+            data['refresh'] = str(refresh)
             return Response(data, status.HTTP_201_CREATED)
         else:
             return (serializer.errors, status.HTTP_403_FORBIDDEN)
@@ -70,6 +71,24 @@ class LoginView(APIView):
         else:
             print("new-password-error", password)
             return Response({'error': 'Wrong Password'}, status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({'message': 'Logout successful, login to continue.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'Error logging out: {str(e)}'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SendToken(APIView):
@@ -130,7 +149,8 @@ class BusinessAccountView(APIView):
         return Response(data, status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = BusinessAccountSerializer(data=request.data, context={'request': request})
+        serializer = BusinessAccountSerializer(
+            data=request.data, context={'request': request})
         data = {}
         if serializer.is_valid():
             business = serializer.save()
@@ -148,26 +168,25 @@ class BusinessListings(APIView):
     def get(self, request):
         data = {}
         user = request.user
-        # user_details = PersonalAccount.objects.get(email=request.user.email)
         serializer = PersonalAccountSerializer(user)
-        city_businesses = BusinessAccount.objects.filter(city=user.city.name)
-        city_businesses_serializer = BusinessHourSerializer(
+        city_businesses = BusinessAccount.objects.filter(city=user.city)
+        city_businesses_serializer = BusinessAccountSerializer(
             city_businesses, many=True)
         data["city_businesses"] = city_businesses_serializer.data
 
-        # if city_businesses.count() < 50:
-        #     state_businesses = BusinessAccount.objects.filter(
-        #         state=user.state.name)
-        #     state_businesses_serializer = BusinessHourSerializer(
-        #         state_businesses, many=True)
-        #     data["state_businesses"] = state_businesses_serializer.data
+        if city_businesses.count() < 50:
+            state_businesses = BusinessAccount.objects.filter(
+                state=user.state)
+            state_businesses_serializer = BusinessAccountSerializer(
+                state_businesses, many=True)
+            data["state_businesses"] = state_businesses_serializer.data
 
-        #     if state_businesses.count() < 50:
-        #         country_businesses = BusinessAccount.objects.filter(
-        #             country=user.country.name)
-        #         country_business_serializer = BusinessHourSerializer(
-        #             country_businesses, many=True)
-        #         data["country_businesses"] = country_business_serializer.data
+            if state_businesses.count() < 50:
+                country_businesses = BusinessAccount.objects.filter(
+                    country=user.country)
+                country_business_serializer = BusinessAccountSerializer(
+                    country_businesses, many=True)
+                data["country_businesses"] = country_business_serializer.data
 
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)

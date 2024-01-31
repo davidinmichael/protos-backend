@@ -6,6 +6,7 @@ urlpatterns = [
     path("personal-account/", PersonalAccountView.as_view()),
     path("verify-email/", VerifyEmail.as_view()),
     path("login/", LoginView.as_view()),
+    path("logout/", LogoutView.as_view()),
     path("send-token/", SendToken.as_view()),
     path("reset-password/", ResetPassword.as_view()),
 
