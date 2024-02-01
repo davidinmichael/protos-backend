@@ -49,7 +49,7 @@ class PersonalAccount(AbstractUser):
     objects = AccountManager()
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} | {self.username}"
+        return f"{self.email} | {self.username}"
 
     def save(self, *args, **kwargs):
         if not self.user_id:
