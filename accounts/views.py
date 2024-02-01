@@ -164,6 +164,12 @@ class BusinessAccountView(APIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+class CategoryView(APIView):
+    def get(self, request):
+        categories = BusinessCategory.objects.all()
+        serializer = BusinessCategorySerializer(categories, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
 class BusinessListings(APIView):
     def get(self, request):
         data = {}
