@@ -195,3 +195,15 @@ class BusinessListings(APIView):
 
         data["current_user"] = serializer.data
         return Response(data, status.HTTP_200_OK)
+
+
+class BusinessListingsOther(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, location):
+        try:
+            businesses = BusinessAccount.objects.filter(state__name=location)
+        except BusinessAccount.DoesNotExist:
+            businesses = BusinessAccount.objects.all()
+        serializer = BusinessAccountSerializer(businesses, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
