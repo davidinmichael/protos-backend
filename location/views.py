@@ -63,18 +63,19 @@ class CreateCity(APIView):
                     latitude=city["latitude"], longitude=city["longitude"])
         return Response({"message": "All Cities created"})
 
-# class CreateCity(APIView):
-#     def get(self, request):
-#         for place in places:
-#             for state in place["states"]:
-#                 state_instance = State.objects.get(identifier=state["id"])
-#                 for city in state["cities"]:
-#                     try:
-#                         City.objects.get(name=city["name"])
-#                     except City.DoesNotExist:
-#                         city_instance = City.objects.create(name=city["name"], state=state_instance,
-#                         latitude=city["latitude"], longitude=city["longitude"])
-#         return Response({"message": "All Cities created"})
+
+class CreateCity(APIView):
+    def get(self, request):
+        for place in places:
+            for state in place["states"]:
+                state_instance = State.objects.get(name=state["name"])
+                for city in state["cities"]:
+                    try:
+                        City.objects.get(name=city["name"])
+                    except City.DoesNotExist:
+                        city_instance = City.objects.create(name=city["name"], state=state_instance,
+                        latitude=city["latitude"], longitude=city["longitude"])
+        return Response({"message": "All Cities created"})
 
 
 
