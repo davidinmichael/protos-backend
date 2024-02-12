@@ -15,6 +15,8 @@ urlpatterns = [
                                            extra_context={
                                                "schema_url": "api_schema"
                                            })),
+    
+    path('auth/', include('drf_social_oauth2.urls')),
 
     path("location/", include("location.urls")),
     path("account/", include("accounts.urls")),
