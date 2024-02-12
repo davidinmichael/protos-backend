@@ -169,9 +169,23 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-   'drf_social_oauth2.backends.DjangoOAuth2',
-   'django.contrib.auth.backends.ModelBackend',
+    # Google  OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
 )
+
+# Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+
+# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
