@@ -6,6 +6,9 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
 from rest_framework.permissions import AllowAny
+from django.db.models.functions import Random
+import random
+
 
 from .serializers import *
 from .models import *
@@ -180,21 +183,24 @@ class BusinessListings(APIView):
         data = {}
         user = request.user
         serializer = PersonalAccountSerializer(user)
-        city_businesses = BusinessAccount.objects.filter(city=user.city)
-        city_businesses_serializer = BusinessAccountSerializer(
-            city_businesses, many=True)
+        city_businesses = list(BusinessAccount.objects.filter(city=user.city))
+        random.shuffle(city_businesses)
+        city_businesses_serializer = BusinessAccountSerializer(city_businesses, many=True)
+
         data["city_businesses"] = city_businesses_serializer.data
 
         if city_businesses.count() < 50:
-            state_businesses = BusinessAccount.objects.filter(
-                state=user.state)
+            state_businesses = list(BusinessAccount.objects.filter(
+                state=user.state))
+            random.shuffle(state_businesses)
             state_businesses_serializer = BusinessAccountSerializer(
                 state_businesses, many=True)
             data["state_businesses"] = state_businesses_serializer.data
 
             if state_businesses.count() < 50:
-                country_businesses = BusinessAccount.objects.filter(
-                    country=user.country)
+                country_businesses = list(BusinessAccount.objects.filter(
+                    country=user.country))
+                random.shuffle(country_businesses)
                 country_business_serializer = BusinessAccountSerializer(
                     country_businesses, many=True)
                 data["country_businesses"] = country_business_serializer.data
