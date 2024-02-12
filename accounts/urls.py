@@ -13,4 +13,5 @@ urlpatterns = [
     path("categories/", CategoryView.as_view()),
     path("business-account/", BusinessAccountView.as_view()),
     path("business-listings/", BusinessListings.as_view()),
+    path("business-listings-others/<str:location>/", BusinessListingsOther.as_view()),
 ]
