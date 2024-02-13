@@ -3,6 +3,7 @@ from .views import *
 
 
 urlpatterns = [
+    path("google/callback/", GoogleCallBack.as_view()),
     path("personal-account/", PersonalAccountView.as_view()),
     path("verify-email/", VerifyEmail.as_view()),
     path("login/", LoginView.as_view()),

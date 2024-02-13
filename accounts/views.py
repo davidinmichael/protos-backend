@@ -15,6 +15,11 @@ from .models import *
 from .utils import *
 
 
+
+class GoogleCallBack(APIView):
+    def get(request):
+        return Response({"success": "Success"}, status.HTTP_200_OK)
+
 class PersonalAccountView(APIView):
     permission_classes = [AllowAny]
 
