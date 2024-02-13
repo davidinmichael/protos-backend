@@ -21,7 +21,7 @@ from .utils import *
 
 class GoogleCallBack(APIView):
     permission_classes = [AllowAny]
-    def get(request):
+    def get(self, request):
     # Extract the authorization code from the request URL
         code = request.GET.get('code')
 
@@ -52,6 +52,7 @@ class GoogleCallBack(APIView):
                     if profile_response.status_code == 200:
                         # Extract and return the user's profile information
                         profile_data = profile_response.json()
+                        print("Profile data:", profile_data)
                         return Response(profile_data, status.HTTP_200_OK)
                     else:
                         return JsonResponse({'error': 'Failed to fetch profile information from Google'}, status=profile_response.status_code)
