@@ -9,7 +9,7 @@ from .utils import *
 def send_welcome_email(sender, instance, created, **kwargs):
     user_token = UserToken.objects.create(user=instance)
     context = {
-        'name': instance.get_account_name(),
+        'name': instance.first_name,
         "token": user_token
     }
     template = render_to_string("account/email_token.html", context)
