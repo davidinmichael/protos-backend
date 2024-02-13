@@ -7,7 +7,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
 from rest_framework.permissions import AllowAny
 from django.db.models.functions import Random
+from django.http import JsonResponse
+from django.conf import settings
 import random
+import requests
 
 
 from .serializers import *
@@ -18,7 +21,46 @@ from .utils import *
 
 class GoogleCallBack(APIView):
     def get(request):
-        return Response({"success": "Success"}, status.HTTP_200_OK)
+    # Extract the authorization code from the request URL
+        code = request.GET.get('code')
+
+        if code:
+            # Prepare the request parameters to exchange the authorization code for an access token
+            token_endpoint = 'https://oauth2.googleapis.com/token'
+            token_params = {
+                'code': code,
+                'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,  # Your Google OAuth2 client ID
+                'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,  # Your Google OAuth2 client secret
+                'redirect_uri': 'https://protosapp.pythonanywhere.com/account/google/callback',  # Must match the callback URL configured in your Google API credentials
+                'grant_type': 'authorization_code',
+            }
+
+            # Make a POST request to exchange the authorization code for an access token
+            response = requests.post(token_endpoint, data=token_params)
+
+            if response.status_code == 200:
+                # Extract the access token from the response
+                access_token = response.json().get('access_token')
+
+                if access_token:
+                    # Make a request to Google's API to fetch the user's profile information
+                    profile_endpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'
+                    headers = {'Authorization': f'Bearer {access_token}'}
+                    profile_response = requests.get(profile_endpoint, headers=headers)
+
+                    if profile_response.status_code == 200:
+                        # Extract and return the user's profile information
+                        profile_data = profile_response.json()
+                        return Response(profile_data, status.HTTP_200_OK)
+                    else:
+                        return JsonResponse({'error': 'Failed to fetch profile information from Google'}, status=profile_response.status_code)
+                else:
+                    return JsonResponse({'error': 'Access token not found in response'}, status=500)
+            else:
+                return JsonResponse({'error': 'Failed to exchange authorization code for access token'}, status=response.status_code)
+        else:
+            return JsonResponse({'error': 'Authorization code not found in request parameters'}, status=400)
+
 
 class PersonalAccountView(APIView):
     permission_classes = [AllowAny]
