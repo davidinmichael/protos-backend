@@ -1,12 +1,10 @@
 from django.shortcuts import redirect
-from requests import delete
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.template.loader import render_to_string
 from rest_framework.permissions import AllowAny
-from django.db.models.functions import Random
 from django.http import JsonResponse
 from django.conf import settings
 import random
@@ -40,20 +38,25 @@ class GoogleCallBack(APIView):
             response = requests.post(token_endpoint, data=token_params)
 
             if response.status_code == 200:
-                # Extract the access token from the response
                 access_token = response.json().get('access_token')
 
                 if access_token:
-                    # Make a request to Google's API to fetch the user's profile information
+                    # Make a request to fetch the user's profile information
                     profile_endpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'
                     headers = {'Authorization': f'Bearer {access_token}'}
                     profile_response = requests.get(profile_endpoint, headers=headers)
 
                     if profile_response.status_code == 200:
-                        # Extract and return the user's profile information
+                        data = {}
                         profile_data = profile_response.json()
-                        print("Profile data:", profile_data)
-                        return Response(profile_data, status.HTTP_200_OK)
+                        # Create new user with the user info
+                        user = PersonalAccount.objects.create_user(first_name=profile_data["given_name"],
+                                                                   last_name=profile_data["family_name"],
+                                                                   email=profile_data["email"])
+                        refresh = RefreshToken.for_user(user)
+                        data['access'] = str(refresh.access_token)
+                        data['refresh'] = str(refresh)
+                        return Response(data, status.HTTP_201_CREATED)
                     else:
                         return JsonResponse({'error': 'Failed to fetch profile information from Google'}, status=profile_response.status_code)
                 else:
