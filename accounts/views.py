@@ -35,8 +35,8 @@ class GoogleCallBack(APIView):
             token_endpoint = 'https://oauth2.googleapis.com/token'
             token_params = {
                 'code': code,
-                'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,  # Your Google OAuth2 client ID
-                'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,  # Your Google OAuth2 client secret
+                'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+                'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
                 'redirect_uri': 'https://protosapp.pythonanywhere.com/account/google/callback',  # Must match the callback URL configured in your Google API credentials
                 'grant_type': 'authorization_code',
             }
@@ -56,16 +56,29 @@ class GoogleCallBack(APIView):
                     if profile_response.status_code == 200:
                         data = {}
                         profile_data = profile_response.json()
+
+                        # Check if the user exists
+                        try:
+                            user = PersonalAccount.objects.get(email=profile_data['email'])
+                            serializer = PersonalAccountSerializer(user)
+                            refresh = RefreshToken.for_user(user)
+                            data["message"] = "Account already exist"
+                            data["user_details"] = serializer.data
+                            data['access'] = str(refresh.access_token)
+                            data['refresh'] = str(refresh)
+                            return Response(data, status.HTTP_201_CREATED)
+                        
+                        except PersonalAccount.DoesNotExist:
                         # Create new user with the user info
-                        user = PersonalAccount.objects.create_user(first_name=profile_data["given_name"],
-                                                                   email=profile_data["email"])
-                        if "family_name" in profile_data:
-                            user.last_name = profile_data["family_name"]
-                            user.save
-                        refresh = RefreshToken.for_user(user)
-                        data['access'] = str(refresh.access_token)
-                        data['refresh'] = str(refresh)
-                        return Response(data, status.HTTP_201_CREATED)
+                            user = PersonalAccount.objects.create_user(first_name=profile_data["given_name"],
+                                                                    email=profile_data["email"])
+                            if "family_name" in profile_data:
+                                user.last_name = profile_data["family_name"]
+                                user.save
+                            refresh = RefreshToken.for_user(user)
+                            data['access'] = str(refresh.access_token)
+                            data['refresh'] = str(refresh)
+                            return Response(data, status.HTTP_201_CREATED)
                     else:
                         return JsonResponse({'error': 'Failed to fetch profile information from Google'}, status=profile_response.status_code)
                 else:
@@ -124,7 +137,6 @@ class LoginView(APIView):
         except PersonalAccount.DoesNotExist:
             return Response({"error": "User does not exist"}, status.HTTP_400_BAD_REQUEST)
         if user.password == password:
-            print("new-password entered", password)
             serializer = PersonalAccountSerializer(user)
             refresh = RefreshToken.for_user(user)
             data["message"] = "Login Successfull"
