@@ -59,7 +59,7 @@ class GoogleCallBack(APIView):
                         # Create new user with the user info
                         user = PersonalAccount.objects.create_user(first_name=profile_data["given_name"],
                                                                    email=profile_data["email"])
-                        if profile_data["family_name"]:
+                        if "family_name" in profile_data:
                             user.last_name = profile_data["family_name"]
                             user.save
                         refresh = RefreshToken.for_user(user)
