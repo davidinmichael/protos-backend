@@ -149,3 +149,7 @@ class BusinessLocation(models.Model):
 #     "password": "testpass",
 #     "confirm_password": "Frontend@123"
 # }
+
+
+
+# f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri=https://protosapp.pythonanywhere.com/account/google/callback"

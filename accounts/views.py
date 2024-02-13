@@ -16,6 +16,13 @@ from .models import *
 from .utils import *
 
 
+# Initiate Google sign up
+class GoogleAuthRedirect(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri=https://protosapp.pythonanywhere.com/account/google/callback"
+        return redirect(redirect_url)
 
 class GoogleCallBack(APIView):
     permission_classes = [AllowAny]
