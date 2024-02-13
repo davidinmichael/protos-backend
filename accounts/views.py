@@ -20,6 +20,7 @@ from .utils import *
 
 
 class GoogleCallBack(APIView):
+    permission_classes = [AllowAny]
     def get(request):
     # Extract the authorization code from the request URL
         code = request.GET.get('code')
