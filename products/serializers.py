@@ -12,10 +12,21 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class BusinessProductSerializer(serializers.ModelSerializer):
-    category = ProductCategorySerializer()
-    business = BusinessAccountSerializer()
+class BusinessProductCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field="name",
+                                            queryset=ProductCategory.objects.all())
+    business = serializers.SlugRelatedField(slug_field="name",
+                                            queryset=BusinessAccount.objects.all())
+    owner = serializers.SlugRelatedField(slug_field="name",
+                                            queryset=PersonalAccount.objects.all())
 
+    class Meta:
+        model = BusinessProduct
+        fields = "__all__"
+        read_only_fields = ["id"]
+
+
+class BusinessProductGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessProduct
         fields = "__all__"

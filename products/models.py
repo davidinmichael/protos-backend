@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import BusinessAccount
+from accounts.models import BusinessAccount, PersonalAccount
 
 
 class ProductCategory(models.Model):
@@ -16,6 +16,7 @@ class BusinessProduct(models.Model):
     category = models.ForeignKey(ProductCategory, null=True,
                                  blank=True, on_delete=models.CASCADE)
     business = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    owner = models.ForeignKey(PersonalAccount, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to='products/', null=True,
                                 blank=True, default="default-product.jpg")
 
