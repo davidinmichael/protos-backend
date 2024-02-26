@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.serializers import BusinessAccountSerializer
+from accounts.serializers import BusinessAccountSerializer, PersonalAccountSerializer
 
 from .models import *
 
@@ -27,6 +27,9 @@ class BusinessProductCreateSerializer(serializers.ModelSerializer):
 
 
 class BusinessProductGetSerializer(serializers.ModelSerializer):
+    category = ProductCategorySerializer()
+    business = BusinessAccountSerializer()
+    owner = PersonalAccountSerializer()
     class Meta:
         model = BusinessProduct
         fields = "__all__"
