@@ -24,7 +24,7 @@ class ProductCategoryView(APIView):
 
 class BusinessProductView(APIView):
     def get(self, request):
-        products = BusinessProduct.objects.all()
+        products = BusinessProduct.objects.filter(business__country__name=request.user.country.name)
         serializer = BusinessProductGetSerializer(products, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
     

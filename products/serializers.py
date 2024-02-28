@@ -17,7 +17,8 @@ class BusinessProductCreateSerializer(serializers.ModelSerializer):
                                             queryset=ProductCategory.objects.all())
     business = serializers.SlugRelatedField(slug_field="name",
                                             queryset=BusinessAccount.objects.all())
-    owner = serializers.StringRelatedField(source="owner.get_account_name")
+    owner = serializers.SlugRelatedField(slug_field="email",
+                                            queryset=PersonalAccount.objects.all())
 
     class Meta:
         model = BusinessProduct
